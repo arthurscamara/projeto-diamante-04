@@ -2,6 +2,7 @@ package com.campusgigs.api.service;
 
 import com.campusgigs.api.dto.LoginRequest;
 import com.campusgigs.api.dto.LoginResponse;
+import com.campusgigs.api.exception.CredenciaisInvalidasException;
 import com.campusgigs.api.model.Usuario;
 import com.campusgigs.api.repository.UsuarioRepository;
 import com.campusgigs.api.security.JwtService;
@@ -19,10 +20,10 @@ public class AuthService {
 
     public LoginResponse autenticar(LoginRequest request) {
         Usuario usuario = usuarioRepository.findByEmail(request.email())
-                .orElseThrow(() -> new IllegalArgumentException("Email ou senha inválidos"));
+                .orElseThrow(() -> new CredenciaisInvalidasException("Email ou senha inválidos"));
 
         if (!passwordEncoder.matches(request.senha(), usuario.getSenha())) {
-            throw new IllegalArgumentException("Email ou senha inválidos");
+            throw new CredenciaisInvalidasException("Email ou senha inválidos");
         }
 
         String token = jwtService.gerarToken(usuario);

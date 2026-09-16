@@ -1,6 +1,8 @@
 package com.campusgigs.api.service;
 
 import com.campusgigs.api.dto.ContratacaoResponse;
+import com.campusgigs.api.exception.RecursoNaoEncontradoException;
+import com.campusgigs.api.exception.RegraNegocioException;
 import com.campusgigs.api.model.Contratacao;
 import com.campusgigs.api.model.Servico;
 import com.campusgigs.api.model.SituacaoServico;
@@ -21,17 +23,17 @@ public class ContratacaoService {
 
     public ContratacaoResponse contratar(Long servicoId, String emailContratante) {
         Servico servico = servicoRepository.findById(servicoId)
-                .orElseThrow(() -> new IllegalArgumentException("Serviço não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Serviço não encontrado"));
 
         if (servico.getSituacao() != SituacaoServico.ATIVO) {
-            throw new IllegalStateException("Só é possível contratar um serviço ativo");
+            throw new RegraNegocioException("Só é possível contratar um serviço ativo");
         }
 
         Usuario contratante = usuarioRepository.findByEmail(emailContratante)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
 
         if (servico.getPrestador().getId().equals(contratante.getId())) {
-            throw new IllegalArgumentException("Você não pode contratar o próprio serviço");
+            throw new RegraNegocioException("Você não pode contratar o próprio serviço");
         }
 
         Contratacao contratacao = Contratacao.builder()
@@ -39,7 +41,6 @@ public class ContratacaoService {
                 .contratante(contratante)
                 .build();
 
-        Contratacao salva = contratacaoRepository.save(contratacao);
-        return ContratacaoResponse.from(salva);
+        return ContratacaoResponse.from(contratacaoRepository.save(contratacao));
     }
 }

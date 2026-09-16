@@ -2,6 +2,8 @@ package com.campusgigs.api.service;
 
 import com.campusgigs.api.dto.CadastroUsuarioRequest;
 import com.campusgigs.api.dto.UsuarioResponse;
+import com.campusgigs.api.exception.EmailJaCadastradoException;
+import com.campusgigs.api.exception.RecursoNaoEncontradoException;
 import com.campusgigs.api.model.Papel;
 import com.campusgigs.api.model.Usuario;
 import com.campusgigs.api.repository.UsuarioRepository;
@@ -18,7 +20,7 @@ public class UsuarioService {
 
     public UsuarioResponse cadastrar(CadastroUsuarioRequest request) {
         if (usuarioRepository.existsByEmail(request.email())) {
-            throw new IllegalArgumentException("Já existe um usuário cadastrado com esse email");
+            throw new EmailJaCadastradoException("Já existe um usuário cadastrado com esse email");
         }
 
         Usuario usuario = Usuario.builder()
@@ -36,7 +38,7 @@ public class UsuarioService {
 
     public UsuarioResponse buscarPorEmail(String email) {
         Usuario usuario = usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
         return UsuarioResponse.from(usuario);
     }
 }

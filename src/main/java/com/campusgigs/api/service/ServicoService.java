@@ -2,6 +2,7 @@ package com.campusgigs.api.service;
 
 import com.campusgigs.api.dto.CriarServicoRequest;
 import com.campusgigs.api.dto.ServicoResponse;
+import com.campusgigs.api.exception.RecursoNaoEncontradoException;
 import com.campusgigs.api.model.Servico;
 import com.campusgigs.api.model.SituacaoServico;
 import com.campusgigs.api.model.Usuario;
@@ -43,7 +44,7 @@ public class ServicoService {
 
     public ServicoResponse encerrar(Long servicoId, String emailUsuarioLogado, boolean isAdmin) {
         Servico servico = servicoRepository.findById(servicoId)
-                .orElseThrow(() -> new IllegalArgumentException("Serviço não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Serviço não encontrado"));
 
         boolean ehDono = servico.getPrestador().getEmail().equals(emailUsuarioLogado);
 
@@ -58,6 +59,6 @@ public class ServicoService {
 
     private Usuario buscarUsuario(String email) {
         return usuarioRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+                .orElseThrow(() -> new RecursoNaoEncontradoException("Usuário não encontrado"));
     }
 }
