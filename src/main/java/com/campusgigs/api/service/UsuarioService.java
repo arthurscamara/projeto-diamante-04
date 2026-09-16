@@ -33,4 +33,10 @@ public class UsuarioService {
 
         return UsuarioResponse.from(salvo);
     }
+
+    public UsuarioResponse buscarPorEmail(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+                .orElseThrow(() -> new IllegalArgumentException("Usuário não encontrado"));
+        return UsuarioResponse.from(usuario);
+    }
 }
