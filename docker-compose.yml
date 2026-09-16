@@ -1,0 +1,33 @@
+services:
+  db:
+    image: postgres:16
+    container_name: campusgigs-db
+    environment:
+      POSTGRES_DB: campusgigs
+      POSTGRES_USER: campusgigs
+      POSTGRES_PASSWORD: campusgigs
+    ports:
+      - "5432:5432"
+    volumes:
+      - campusgigs-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U campusgigs"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: campusgigs-app
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/campusgigs
+      SPRING_DATASOURCE_USERNAME: campusgigs
+      SPRING_DATASOURCE_PASSWORD: campusgigs
+    ports:
+      - "8080:8080"
+
+volumes:
+  campusgigs-data:
